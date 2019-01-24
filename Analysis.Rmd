@@ -1,0 +1,99 @@
+---
+title: "Analysis"
+author: "Jamie"
+date: "January 23, 2019"
+output: html_document
+---
+# *B. burgdorferi* sequence analyses
+
+```{r message=FALSE, warning=FALSE}
+library(knitr)
+library(readr)
+mySeq <- read_csv("Sequences.csv")
+
+Afreq1 <- length(gregexpr('A', mySeq$x[1])[[1]])
+Cfreq1 <- length(gregexpr('C', mySeq$x[1])[[1]])
+Tfreq1 <- length(gregexpr('T', mySeq$x[1])[[1]])
+Gfreq1 <- length(gregexpr('G', mySeq$x[1])[[1]])
+
+Afreq2 <- length(gregexpr('A', mySeq$x[2])[[1]])
+Cfreq2 <- length(gregexpr('C', mySeq$x[2])[[1]])
+Tfreq2 <- length(gregexpr('T', mySeq$x[2])[[1]])
+Gfreq2 <- length(gregexpr('G', mySeq$x[2])[[1]])
+
+Afreq3 <- length(gregexpr('A', mySeq$x[3])[[1]])
+Cfreq3 <- length(gregexpr('C', mySeq$x[3])[[1]])
+Tfreq3 <- length(gregexpr('T', mySeq$x[3])[[1]])
+Gfreq3 <- length(gregexpr('G', mySeq$x[3])[[1]])
+```
+
+## *B. burgdorferi* sequences
+
+### Sequence 1 <HQ433692.1>
+```{r}
+print(mySeq$x[1])
+```
+### Sequence 2 <HQ433694.1>
+```{r}
+print(mySeq$x[2])
+```
+### Sequence 3 <HQ433691.1>
+```{r}
+print(mySeq$x[3])
+```
+
+# Summary table of base frequencies
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(kableExtra)
+Avalues <- c(Afreq1, Afreq2, Afreq3)
+Cvalues <- c(Cfreq1, Cfreq2, Cfreq3)
+Tvalues <- c(Tfreq1, Tfreq2, Tfreq3)
+Gvalues <- c(Gfreq1, Gfreq2, Gfreq3)
+
+baseNums <- data.frame(Avalues, Cvalues, Tvalues, Gvalues)
+rownames(baseNums) <- c(mySeq$X1)
+colnames(baseNums) <- c('A', 'C', 'T', 'G')
+
+baseNums %>%
+  kable(caption = 'Base Frequency') %>%
+  kable_styling()
+```
+
+# *Borrelia burgdorferi*
+
+![An image of *B. burgdorferi*](Borrelia.jpg)
+
+Info on *B. burgdorferi*:[Borrelia burgdorferi](https://en.wikipedia.org/wiki/Borrelia_burgdorferi)
+
+# Percent G/C content for *B. burgdorferi* sequences
+
+```{r}
+Pct1 <- (((Cfreq1 + Gfreq1)/(Afreq1 + Cfreq1 + Tfreq1 + Gfreq1))*100)
+Pct2 <- (((Cfreq2 + Gfreq2)/(Afreq2 + Cfreq2 + Tfreq2 + Gfreq2))*100)
+Pct3 <- (((Cfreq3 + Gfreq3)/(Afreq3 + Cfreq3 + Tfreq3 + Gfreq3))*100) 
+
+GCvals <- c(Pct1, Pct2, Pct3)
+PctTable <- data.frame(GCvals)
+rownames(PctTable) <- c(mySeq$X1)
+colnames(PctTable) <- c('% GC')
+
+PctTable %>%
+  kable(caption = '% GC in sequences') %>%
+  kable_styling()
+```
+
+# %GC scatterplot
+
+```{r}
+library(ggplot2)
+GCdata <- read_csv("GC_content.csv")
+GCdata <- GCdata[,c(2,3,4)]
+GCdata$GC <- ((GCdata$G) + (GCdata$C))
+qplot(x = Species, y = GC, data = GCdata,
+  main = 'GC content within species',
+  ylab = '%GC content', size = I(1),
+  alpha = I(0.3)) +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5))
+```
